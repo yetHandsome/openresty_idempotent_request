@@ -1,3 +1,10 @@
+--避免 由于重定向导致 access_by_lua_file 脚本访问2次的问题
+# ngx.var.uri 为重定向前地址 ngx.var.request_uri 为重定向后地址， 重定向前 ngx.var.request_uri 等于 ngx.var.uri
+
+if( ngx.var.uri ~= ngx.var.request_uri ) then
+    return
+end
+
 local redis = require "resty.redis"  --引入redis模块
 local redis_key = getReqKey()
 
@@ -33,13 +40,6 @@ end
 
 close_redis(red)
 
-if ( ngx.var.request_uri == [[/]] and resp >= 2)
-then 
-
-   resp = resp-1 --因为根路径 / 里面 index 到 /index.html 导致access_by_lua_file 脚本访问2次所以这里要减去第一次成功的从定向
-
-end
-
 if (resp > 1) 
 then
 
@@ -47,7 +47,8 @@ then
 
 end
 
-if ( ngx.var.request_uri ~= [[/index.html]] and  ngx.var.request_uri ~= [[/]])
+--这个只是为了演示效果而添加的，正常情况是可以去掉整段代码
+if ( ngx.var.request_uri ~= [[/index.html]] and  ngx.var.request_uri ~= [[/50x.html]] and  ngx.var.request_uri ~= [[/]])
 then 
 
     say_html('{"code":200,"msg":"接口 ['..ngx.var.request_uri..'] 3秒内相同操作访问'..resp..'次,正常访问"}')
