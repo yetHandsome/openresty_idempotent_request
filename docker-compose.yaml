@@ -1,0 +1,35 @@
+version: '3'
+services:
+  web:
+    image: openresty/openresty
+    #image: captainhub/openresty
+    ports:
+      - 8084:80
+    volumes:
+      - .\nginx\:/etc/nginx/
+      - .\nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf 
+      #- .\nginx.conf:/etc/openresty/nginx.conf
+    environment:
+       - TZ=Asia/Shanghai
+    networks:
+      - my-web-networks
+    command:
+    - sh
+    - -c 
+    - |
+        #解决openresty 找不到lua扩展问题
+        ln -sf /usr/local/openresty/lualib/resty /etc/nginx/lua/resty &
+        /usr/bin/openresty -g "daemon off;"
+  redis-server:
+    hostname: redis-server
+    container_name: redis-server
+    image: redis
+    ports:
+      - 6389:6379
+    command: redis-server --requirepass test123
+    networks:
+      - my-web-networks
+
+networks:
+  my-web-networks:
+    driver: bridge
