@@ -14,7 +14,7 @@
     状态是失败了则把status改为处理中，发往应用，应用如果处理完成http状态为200那么，
     nginx的lua设置redis的status为OK，其它值设置status为失败。这样业务代码就无需任何改造了
 
-    目前只做了重复请求的检测，status 那部分还没有做
+    目前只做了重复请求的检测，status 那部分还没有做,md5也还为实现
 
     2.其实一些框架都是利用一个一次性token,在请求表单的时候埋入表单，提交的时候删除，再次提交查询没有这个token就不允许提交来限制
     
@@ -57,7 +57,7 @@
 
 ###配置文件详细说明：
 
-    redis_host="redis-server" 这个直接跟docker-compose 里面定义的 redis 服务的 hostname 一致即可
+    redis_host="redis-server" 这个直接跟docker-compose 里面定义的 redis 服务的服务名称一致即可 （services 下面定义的服务 或者该服务的 hostname 一致即可）
     redis_port=6379
     redis_password="test123" 这个跟 docker-compose 里面定义的 redis 密码一致即可 --requirepass test123
     redis_key_prefix="ri:" 这个是key前缀，避免跟其它业务冲突，这个自行根据需求修改即可
